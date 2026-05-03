@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Cyber Indicator Command Center</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <main class="shell">
+        <section class="hero" aria-labelledby="dashboard-title">
+            <div class="hero-copy">
+                <p class="eyebrow">Threat intelligence fusion</p>
+                <h1 id="dashboard-title">Cyber indicator command center</h1>
+                <p class="hero-subtitle">Correlate reputation, abuse history, threat collections, and country-level location in one analyst view.</p>
+            </div>
+
+            <form class="search-form" id="search-form">
+                <div class="field">
+                    <label for="indicator">IP address or domain</label>
+                    <input id="indicator" name="indicator" autocomplete="off" placeholder="8.8.8.8, example.com, or https://example.com/path">
+                    <p class="field-error" id="field-error"></p>
+                </div>
+                <button type="submit">Analyze</button>
+            </form>
+        </section>
+
+        <section class="empty-state" id="empty-state">
+            <div>
+                <p class="eyebrow">Standing by</p>
+                <h2>Enter an IP address or domain to build a live intelligence report.</h2>
+            </div>
+            <ul>
+                <li>Detection and reputation context</li>
+                <li>Abuse score and report history</li>
+                <li>Threat collections and country trace</li>
+            </ul>
+        </section>
+
+        <section class="loading-state" id="loading-state" hidden>
+            <p class="eyebrow">Analyzing</p>
+            <h2>Building combined report...</h2>
+        </section>
+
+        <section id="report-root" hidden></section>
+    </main>
+
+    <script src="/app.js" type="module"></script>
+</body>
+</html>

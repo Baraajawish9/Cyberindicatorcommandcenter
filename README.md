@@ -32,6 +32,29 @@ python manage.py runserver
 
 Open `http://127.0.0.1:8000/`.
 
+## Deploy to Netlify
+
+This repository includes a Netlify-compatible frontend and serverless function in the `netlify/` directory. The Django app remains available for local development, but Netlify deploys the static frontend plus the serverless report API.
+
+1. Open Netlify and choose **Add new site** > **Import an existing project**.
+2. Connect the GitHub repository.
+3. Use these build settings:
+   - Build command: `npm run build`
+   - Publish directory: `netlify`
+   - Functions directory: `netlify/functions`
+4. Add these environment variables in Netlify site settings. Mark them as secret values:
+   - `VIRUSTOTAL_API_KEY`
+   - `ABUSEIPDB_API_KEY`
+   - `ALIENVAULT_API_KEY`
+5. Deploy the site.
+
+Optional internal request caps:
+
+- `VIRUSTOTAL_DAILY_LIMIT`
+- `VIRUSTOTAL_MINUTE_LIMIT`
+- `ABUSEIPDB_DAILY_LIMIT`
+- `ALIENVAULT_DAILY_LIMIT`
+
 ## Notes
 
 The dashboard still renders if one or more keys are missing. Each source card shows the setup or API error instead of failing the whole report.
