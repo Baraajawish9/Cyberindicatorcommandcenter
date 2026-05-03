@@ -1,0 +1,184 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Cyber Threat Intelligence Dashboard</title>
+    <link rel="stylesheet" href="{% static 'dashboard/styles.css' %}">
+</head>
+<body>
+    <main class="shell">
+        <section class="hero" aria-labelledby="dashboard-title">
+            <div class="hero-copy">
+                <p class="eyebrow">Threat intelligence fusion</p>
+                <h1 id="dashboard-title">Cyber indicator command center</h1>
+                <p class="hero-subtitle">Correlate reputation, abuse history, threat collections, and country-level location in one analyst view.</p>
+            </div>
+
+            <form class="search-form" method="get">
+                <div class="field">
+                    {{ form.ip_address.label_tag }}
+                    {{ form.ip_address }}
+                    {% if form.ip_address.errors %}
+                        <p class="field-error">{{ form.ip_address.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                <button type="submit">Analyze</button>
+            </form>
+        </section>
+
+        {% if report %}
+            <section class="command-grid" aria-label="Combined report">
+                <article class="risk-panel {{ report.risk_level.tone }}">
+                    <div class="scanlines"></div>
+                    <p class="eyebrow">Combined risk</p>
+                    <div class="risk-layout">
+                        <div class="score-ring" style="--score: {{ report.overall_score|default:0 }};">
+                            <span>{% if report.overall_score != None %}{{ report.overall_score }}{% else %}--{% endif %}</span>
+                        </div>
+                        <div>
+                            <h2>{{ report.risk_level.label }}</h2>
+                            <p class="mono">
+                                {{ report.display_value }}
+                                {% if report.indicator_kind == 'ip' %}
+                                    / IPv{{ report.ip_version }}
+                                {% elif report.resolved_ip %}
+                                    / {{ report.resolved_ip }}
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="map-panel">
+                    <header>
+                        <div>
+                            <p class="eyebrow">Country trace</p>
+                            <h2>{{ report.map.label }}</h2>
+                        </div>
+                        <span class="precision">{{ report.map.precision }}</span>
+                    </header>
+
+                    <div class="world-map" style="--pin-x: {{ report.map.x }}%; --pin-y: {{ report.map.y }}%;">
+                        {% if report.map.available %}
+                            <span class="map-pin" aria-label="IP location"></span>
+                        {% endif %}
+                    </div>
+
+                    <footer>
+                        <span>Approximate country marker</span>
+                        <span class="mono">{{ report.display_value }}</span>
+                    </footer>
+                </article>
+
+                <article class="intel-panel">
+                    <p class="eyebrow">Key signals</p>
+                    <div class="highlight-stack">
+                        {% for item in report.highlights %}
+                            <p><span></span>{{ item }}</p>
+                        {% endfor %}
+                    </div>
+                </article>
+            </section>
+
+            <section class="combined-report" aria-label="Combined intelligence report">
+                <header>
+                    <div>
+                        <p class="eyebrow">Unified report</p>
+                        <h2>Combined intelligence report</h2>
+                    </div>
+                    <span class="precision">merged</span>
+                </header>
+
+                <div class="combined-layout">
+                    <section class="report-section">
+                        <h3>Entity profile</h3>
+                        {% if report.combined.facts %}
+                            <dl class="facts">
+                                {% for fact in report.combined.facts %}
+                                    <div>
+                                        <dt>{{ fact.label }}</dt>
+                                        <dd>{{ fact.value }}</dd>
+                                    </div>
+                                {% endfor %}
+                            </dl>
+                        {% else %}
+                            <p class="empty">No profile details returned.</p>
+                        {% endif %}
+                    </section>
+
+                    <section class="report-section">
+                        <h3>Detection breakdown</h3>
+                        {% if report.combined.analysis_stats %}
+                            <div class="stat-bars">
+                                {% for label, count in report.combined.analysis_stats.items %}
+                                    <div class="stat-row">
+                                        <span>{{ label|title }}</span>
+                                        <div><i style="width: {{ count }}%;"></i></div>
+                                        <strong>{{ count }}</strong>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="empty">No detection breakdown returned.</p>
+                        {% endif %}
+
+                        {% if report.combined.tags %}
+                            <div class="tags">
+                                {% for tag in report.combined.tags %}
+                                    <span>{{ tag }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </section>
+
+                    <section class="report-section report-section-wide">
+                        <h3>Recent abuse reports</h3>
+                        {% if report.combined.recent_reports %}
+                            <ul class="report-list">
+                                {% for report_item in report.combined.recent_reports %}
+                                    <li>
+                                        <strong>{{ report_item.reportedAt|default:'Unknown date' }}</strong>
+                                        <span>{{ report_item.comment|default:'No comment provided' }}</span>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p class="empty">No recent report comments returned.</p>
+                        {% endif %}
+                    </section>
+
+                    <section class="report-section report-section-wide">
+                        <h3>Related threat collections</h3>
+                        {% if report.combined.collections %}
+                            <ul class="pulse-list">
+                                {% for collection in report.combined.collections %}
+                                    <li>
+                                        <strong>{{ collection.name }}</strong>
+                                        <span>{{ collection.modified|default:'No date' }}</span>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p class="empty">No related threat collections returned.</p>
+                        {% endif %}
+                    </section>
+                </div>
+            </section>
+        {% else %}
+            <section class="empty-state">
+                <div>
+                    <p class="eyebrow">Standing by</p>
+                    <h2>Enter an IP address or domain to build a live intelligence report.</h2>
+                </div>
+                <ul>
+                    <li>Detection and reputation context</li>
+                    <li>Abuse score and report history</li>
+                    <li>Threat collections and country trace</li>
+                </ul>
+            </section>
+        {% endif %}
+    </main>
+</body>
+</html>
