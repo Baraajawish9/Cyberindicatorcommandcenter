@@ -8,6 +8,12 @@ A Django dashboard that accepts an IPv4 address, IPv6 address, or domain and com
 
 The report includes a combined risk score, a unified report, and a country-level world map marker.
 
+## Live Site
+
+The deployed dashboard is available at:
+
+https://cybercomandcenter.netlify.app/
+
 ## Setup
 
 ```powershell
@@ -30,7 +36,7 @@ Run the app:
 python manage.py runserver
 ```
 
-Open `http://127.0.0.1:8000/`.
+For local development, open `http://127.0.0.1:8000/`.
 
 ## Deploy to Netlify
 
